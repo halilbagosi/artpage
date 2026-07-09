@@ -3,15 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/convert-heic.mjs && tinacms dev -c \"next dev --hostname 0.0.0.0\"",
+    "build": "node scripts/convert-heic.mjs && tinacms build && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
+    "@samasante/liquid-glass": "^0.1.1",
+    "@tinacms/cli": "^2.5.3",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
+    "heic-convert": "^2.1.0",
+    "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.6.0",
+    "tinacms": "^3.10.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
