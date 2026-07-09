@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# TinaCMS
+/tina/__generated__/
+
+# IDEs / AI tools
+/.claude/
+
+# Temporary / References
+/_reference/
+/test-sort.js
+
