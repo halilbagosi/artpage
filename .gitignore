@@ -45,6 +45,8 @@ next-env.d.ts
 
 # IDEs / AI tools
 /.claude/
+/CLAUDE.md
+/AGENTS.md
 
 # Temporary / References
 /_reference/
