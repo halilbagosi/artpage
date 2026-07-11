@@ -1,75 +1,76 @@
-'use client';
+import type { Metadata } from "next";
+import Image from "next/image";
+import WorldShell from "@/components/WorldShell";
+import Reveal from "@/components/Reveal";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { TinaMarkdown, TinaMarkdownContent } from 'tinacms/dist/rich-text';
-import client from '@/lib/tina-client';
+export const metadata: Metadata = {
+  title: "About",
+  description: "About Halil Bagosi — painter, photographer, and filmmaker.",
+};
 
 export default function AboutPage() {
-  const [profileImage, setProfileImage] = useState<string>('');
-  const [body, setBody] = useState<TinaMarkdownContent | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await client.queries.aboutConnection();
-        const node = res.data.aboutConnection.edges?.[0]?.node;
-        if (node?.profileImage) setProfileImage(node.profileImage);
-        if (node?.body) setBody(node.body as TinaMarkdownContent);
-      } catch (err) {
-        console.error('Failed to load About content from TinaCMS:', err);
-      }
-    }
-    load();
-  }, []);
-
   return (
-    <div className="w-full max-w-4xl mx-auto min-h-full flex flex-col justify-center font-sans pt-32 px-6 pb-16 relative z-10">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="bg-bg-primary/80 backdrop-blur-md p-6 sm:p-10 md:p-12 rounded-3xl shadow-xl border hairline"
-      >
-        <h1 className="text-4xl md:text-6xl font-bold mb-8 md:mb-10 text-text-primary">About Me</h1>
-
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-          <div className="aspect-[3/4] bg-bg-secondary rounded-2xl overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700">
-            {profileImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profileImage}
-                alt="Halil Bagosi"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-accent-primary/20 mix-blend-overlay" />
-            )}
+    <WorldShell world="about">
+      <div className="mx-auto max-w-5xl px-5 pb-24 pt-32 md:px-10 md:pt-44">
+        <Reveal>
+          <div className="font-mono text-[11px] uppercase tracking-[0.35em] text-world-accent">
+            The person behind the worlds
           </div>
+          <h1 className="mt-4 font-serif text-6xl leading-[0.95] tracking-tight md:text-8xl">
+            Halil Bagosi
+          </h1>
+        </Reveal>
 
-          <div className="flex flex-col justify-center space-y-5 md:space-y-6 text-base md:text-lg text-text-secondary leading-relaxed">
-            {body ? (
-              <div className="prose-headings:text-text-primary space-y-5">
-                <TinaMarkdown content={body} />
+        <div className="mt-14 flex flex-col gap-10 md:flex-row md:gap-16">
+          <Reveal className="md:w-2/5">
+            <div className="border border-world-hairline bg-world-surface p-3">
+              <div className="relative aspect-4/5">
+                <Image
+                  src="/media/DSCF2672.JPG"
+                  alt="Halil Bagosi"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover object-[30%_center]"
+                />
               </div>
-            ) : (
-              <>
-                <p>
-                  I am a multidisciplinary artist and creative director based in New York.
-                  My work spans tactile fine art, high-energy commercial photography,
-                  and cinematic videography.
-                </p>
-                <p>
-                  Through &ldquo;The Textured Gallery&rdquo; I explore memory and form. In
-                  commercial photography I help brands tell bold stories. And in film
-                  direction I capture the most critical moments of life and profession.
-                </p>
-                <p>Welcome to my digital mind.</p>
-              </>
-            )}
-          </div>
+            </div>
+          </Reveal>
+
+          <Reveal className="md:w-3/5">
+            <div className="space-y-5 text-base leading-relaxed text-world-ink/90">
+              <p>
+                I work across three disciplines that feed one another: painting
+                teaches me patience and color, photography teaches me light and
+                timing, and film ties them together with rhythm.
+              </p>
+              <p>
+                On the canvas I paint portraits and landscapes in oil and
+                acrylic. Behind the camera I shoot interiors, product, and
+                campaign work for clients. Behind the lens in motion, I direct
+                and edit short-form films.
+              </p>
+              <p>
+                If you would like to commission a painting, book a shoot, or
+                talk about a film project — write to me.
+              </p>
+            </div>
+
+            <div className="mt-10 border-t border-world-hairline pt-6">
+              <a
+                href="mailto:halilbagosi24@icloud.com"
+                className="group inline-flex items-baseline gap-3"
+              >
+                <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-world-muted">
+                  Email
+                </span>
+                <span className="font-serif text-2xl text-world-ink underline decoration-world-accent decoration-1 underline-offset-4 transition-opacity group-hover:opacity-70">
+                  halilbagosi24@icloud.com
+                </span>
+              </a>
+            </div>
+          </Reveal>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </WorldShell>
   );
 }
