@@ -62,7 +62,7 @@ export default function DarkroomGallery({
                       />
                     </div>
                     {/* Contact-sheet stamp on hover */}
-                    <div className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between bg-black/85 px-4 py-3 transition-transform duration-400 group-hover:translate-y-0">
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/85 px-4 py-3 transition-transform duration-400 md:translate-y-full md:group-hover:translate-y-0">
                       <span className="text-sm text-white">{photo.title}</span>
                       <span className="font-mono text-[10px] tracking-[0.25em] text-white/50">
                         {stamp}

@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1783770764.4277167,
-    "ast_hash": "468d6fb861353a01b69dc0a29cd781eb",
+    "mtime": 1783715271.0369306,
+    "ast_hash": "8d734c1ac19a626a6782ffcc462e9f21",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "src/app/about/page.tsx": {
-    "mtime": 1783782230.8248599,
-    "ast_hash": "3e8a5e18d98112f1e0bfa3da3a580590",
+    "mtime": 1783765519.4697275,
+    "ast_hash": "18648bf59d44232d279af44252590b86",
     "semantic_hash": ""
   },
   "src/app/art/page.tsx": {
@@ -50,18 +50,18 @@
     "semantic_hash": ""
   },
   "src/components/AtelierGallery.tsx": {
-    "mtime": 1783770830.4462302,
-    "ast_hash": "59ec83473fb9e3c8493ef1e17a24119a",
+    "mtime": 1783715425.0799398,
+    "ast_hash": "204fd27bd9dcf3230a201fcc7f1977f2",
     "semantic_hash": ""
   },
   "src/components/DarkroomGallery.tsx": {
-    "mtime": 1783782176.783272,
-    "ast_hash": "bb0a77bf9c598e54299825a94b31bb46",
+    "mtime": 1783766297.597585,
+    "ast_hash": "f7a92b5dcadf285a25451e4f21b7dc1f",
     "semantic_hash": ""
   },
   "src/components/Gateway.tsx": {
-    "mtime": 1783782316.3603392,
-    "ast_hash": "339eadd3af7e4d13c5b67ae68358e1cc",
+    "mtime": 1783764507.1049094,
+    "ast_hash": "d55ba656d95e859c23a564f93c92eef1",
     "semantic_hash": ""
   },
   "src/components/Lightbox.tsx": {
@@ -80,18 +80,18 @@
     "semantic_hash": ""
   },
   "src/components/WorldHero.tsx": {
-    "mtime": 1783782196.3902557,
-    "ast_hash": "085416ddf4fe81aa30405abae93d0a81",
+    "mtime": 1783764270.5131378,
+    "ast_hash": "e5f8f9ed9a15b1babd698a3bb371c24f",
     "semantic_hash": ""
   },
   "src/components/WorldShell.tsx": {
-    "mtime": 1783782257.5825398,
-    "ast_hash": "05a5852c32b8f14fbd264231469d3878",
+    "mtime": 1783715389.6436014,
+    "ast_hash": "3fc290897b3e26427ca7f0df14bbce50",
     "semantic_hash": ""
   },
   "src/lib/content.ts": {
-    "mtime": 1783770794.286051,
-    "ast_hash": "05db9130ecf8c22687927363e71f99b7",
+    "mtime": 1783715286.0863788,
+    "ast_hash": "78e3aca2282827d734f8e11b4e59f87f",
     "semantic_hash": ""
   },
   "tsconfig.json": {

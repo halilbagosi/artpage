@@ -34,8 +34,8 @@ export default function WorldShell({
 
   return (
     <div data-world={world} className="min-h-screen bg-world-bg text-world-ink">
-      <header className="fixed inset-x-0 top-0 z-40">
-        <div className="flex items-center justify-between px-5 py-4 md:px-10">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-world-hairline bg-[color-mix(in_srgb,var(--world-bg)_75%,transparent)] backdrop-blur-xl">
+        <div className="flex items-center justify-between px-5 py-3 md:px-10 md:py-4">
           <Link
             href="/"
             aria-label="Back to the gateway"
@@ -43,7 +43,7 @@ export default function WorldShell({
           >
             HB<span className="text-world-accent">.</span>
           </Link>
-          <nav className="flex items-center gap-5 md:gap-7">
+          <nav className="flex items-center gap-4 md:gap-7">
             {SWITCHER.map((item) => {
               const active = pathname === item.href;
               return (
@@ -51,7 +51,7 @@ export default function WorldShell({
                   key={item.href}
                   href={item.href}
                   className={clsx(
-                    "font-mono text-[11px] uppercase tracking-[0.25em] transition-opacity",
+                    "font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity md:text-[11px] md:tracking-[0.25em]",
                     active
                       ? "text-world-ink"
                       : "text-world-muted hover:text-world-ink"
@@ -70,7 +70,7 @@ export default function WorldShell({
             <Link
               href="/about"
               className={clsx(
-                "font-mono text-[11px] uppercase tracking-[0.25em] transition-opacity",
+                "font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity md:text-[11px] md:tracking-[0.25em]",
                 pathname === "/about"
                   ? "text-world-ink"
                   : "text-world-muted hover:text-world-ink"
@@ -80,7 +80,6 @@ export default function WorldShell({
             </Link>
           </nav>
         </div>
-        <div className="h-px bg-world-hairline" />
       </header>
 
       {children}

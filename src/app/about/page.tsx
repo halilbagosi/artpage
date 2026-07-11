@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <WorldShell world="about">
-      <div className="mx-auto max-w-5xl px-5 pb-24 pt-32 md:px-10 md:pt-44">
+      <div className="mx-auto max-w-5xl px-5 pb-24 pt-28 md:px-10 md:pt-44">
         <Reveal>
           <div className="font-mono text-[11px] uppercase tracking-[0.35em] text-world-accent">
             The person behind the worlds
           </div>
-          <h1 className="mt-4 font-serif text-6xl leading-[0.95] tracking-tight md:text-8xl">
+          <h1 className="mt-4 font-serif text-[clamp(2.75rem,13vw,4.5rem)] leading-[0.95] tracking-tight md:text-8xl">
             Halil Bagosi
           </h1>
         </Reveal>
@@ -58,12 +58,12 @@ export default function AboutPage() {
             <div className="mt-10 border-t border-world-hairline pt-6">
               <a
                 href="mailto:halilbagosi24@icloud.com"
-                className="group inline-flex items-baseline gap-3"
+                className="group inline-flex flex-wrap items-baseline gap-x-3 gap-y-1"
               >
                 <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-world-muted">
                   Email
                 </span>
-                <span className="font-serif text-2xl text-world-ink underline decoration-world-accent decoration-1 underline-offset-4 transition-opacity group-hover:opacity-70">
+                <span className="break-all font-serif text-xl text-world-ink underline decoration-world-accent decoration-1 underline-offset-4 transition-opacity group-hover:opacity-70 md:text-2xl">
                   halilbagosi24@icloud.com
                 </span>
               </a>

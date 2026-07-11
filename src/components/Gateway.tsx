@@ -71,7 +71,7 @@ export default function Gateway() {
             onBlur={() => setHovered(null)}
             onClick={() => enter(world)}
             aria-label={`Enter ${world.label}`}
-            className="relative block min-h-0 min-w-0 cursor-pointer overflow-hidden text-left outline-none"
+            className="group relative block min-h-0 min-w-0 cursor-pointer overflow-hidden text-left outline-none"
             animate={{ flexGrow: isHovered ? 2.1 : 1 }}
             initial={{ flexGrow: 1 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -99,6 +99,9 @@ export default function Gateway() {
               />
             </motion.div>
 
+            {/* Caption scrim */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/65 to-transparent" />
+
             {/* Panel caption */}
             <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
               <div className="font-mono text-[11px] tracking-[0.35em] text-white/60 uppercase">
@@ -107,13 +110,9 @@ export default function Gateway() {
               <div className="mt-2 font-serif text-3xl md:text-5xl text-white">
                 {world.label}
               </div>
-              <motion.div
-                className="mt-2 font-mono text-[11px] tracking-[0.3em] uppercase text-white/70"
-                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 8 }}
-                transition={{ duration: 0.4 }}
-              >
+              <div className="mt-2 font-mono text-[11px] tracking-[0.3em] uppercase text-white/70 transition-all duration-400 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100">
                 {world.tagline} →
-              </motion.div>
+              </div>
             </div>
 
             {/* Hairline divider between panels */}
