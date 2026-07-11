@@ -1,7 +1,21 @@
 import fs from "fs";
 import path from "path";
+import { imageSize } from "image-size";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
+const PUBLIC_DIR = path.join(process.cwd(), "public");
+
+/** Aspect ratio (width / height) of an image under public/, or null if unreadable. */
+function imageAspect(publicPath: string): number | null {
+  try {
+    const { width, height } = imageSize(
+      fs.readFileSync(path.join(PUBLIC_DIR, publicPath))
+    );
+    return width && height ? width / height : null;
+  } catch {
+    return null;
+  }
+}
 
 /** Minimal frontmatter parser — the collections only use flat `key: value` pairs. */
 function parseFrontmatter(raw: string): Record<string, string> {
@@ -50,10 +64,14 @@ export interface Painting {
   palette: string;
   style: string;
   description: string;
+  /** width / height of the artwork image; frames render at this ratio */
+  aspect: number;
 }
 
 export function getPaintings(): Painting[] {
-  return (readCollection("paintings") as unknown as Painting[]).sort((a, b) => {
+  return (readCollection("paintings") as unknown as Painting[])
+    .map((p) => ({ ...p, aspect: imageAspect(p.image) ?? 4 / 5 }))
+    .sort((a, b) => {
     const yearDiff = Number(b.year || 0) - Number(a.year || 0);
     if (yearDiff !== 0) return yearDiff;
     return (

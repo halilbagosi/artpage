@@ -41,7 +41,10 @@ export default function AtelierGallery({ paintings }: { paintings: Painting[] })
               >
                 {/* Gallery frame */}
                 <div className="border border-world-hairline bg-world-surface p-3 shadow-[0_20px_50px_-24px_rgba(34,29,24,0.45)] transition-transform duration-500 group-hover:-translate-y-1 md:p-5">
-                  <div className="relative aspect-4/5 overflow-hidden">
+                  <div
+                    className="relative overflow-hidden"
+                    style={{ aspectRatio: painting.aspect }}
+                  >
                     <Image
                       src={painting.image}
                       alt={painting.title}
