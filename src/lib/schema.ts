@@ -4,7 +4,7 @@
  * No Node imports here — this module is bundled for the client too.
  */
 
-export type FieldType = "text" | "textarea" | "select" | "boolean" | "media";
+export type FieldType = "text" | "textarea" | "select" | "boolean" | "media" | "url";
 
 export interface FieldDef {
   key: string;
@@ -75,7 +75,13 @@ export const COLLECTIONS = {
         label: "Video",
         type: "media",
         accept: "video",
-        hint: "Optional — plays muted in the frame",
+        hint: "Optional short clip — loops muted in the frame on hover",
+      },
+      {
+        key: "link",
+        label: "Full film link",
+        type: "url",
+        hint: "Vimeo or YouTube link — clicking the frame opens it full screen with sound",
       },
       { key: "year", label: "Year", type: "text" },
       { key: "role", label: "Role", type: "text", hint: "e.g. Director / Editor" },

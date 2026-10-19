@@ -51,6 +51,7 @@ year: '2026'
 role: Director / Editor
 runtime: '02:40'
 video: /media/my-film.mp4   # optional; plays on hover when present
+link: https://vimeo.com/123456789   # optional; Vimeo or YouTube, opens full screen with sound on click
 sample: 'true'              # marks placeholder entries
 ```
 

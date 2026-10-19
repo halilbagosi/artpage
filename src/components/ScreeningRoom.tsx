@@ -1,11 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Film } from "@/lib/content";
 import Reveal from "./Reveal";
+import FilmPlayer, { isPlayable } from "./FilmPlayer";
+import PlayCue from "./PlayCue";
 
 export default function ScreeningRoom({ films }: { films: Film[] }) {
+  const [playing, setPlaying] = useState<Film | null>(null);
+
   return (
     <div className="mx-auto max-w-6xl px-5 pb-24 pt-10 md:px-10 md:pt-20">
       <Reveal>
@@ -20,6 +25,7 @@ export default function ScreeningRoom({ films }: { films: Film[] }) {
           ["Year", film.year],
           ["Runtime", film.runtime],
         ].filter(([, value]) => value);
+        const playable = isPlayable(film);
 
         return (
           <Reveal key={film.slug}>
@@ -35,7 +41,11 @@ export default function ScreeningRoom({ films }: { films: Film[] }) {
               </div>
 
               {/* Letterboxed 2.39:1 frame */}
-              <div className="group relative overflow-hidden bg-black shadow-[0_40px_100px_-50px_rgba(233,180,92,0.35)]">
+              <div
+                className="group relative overflow-hidden bg-black shadow-[0_40px_100px_-50px_rgba(233,180,92,0.35)]"
+                onMouseEnter={(e) => e.currentTarget.querySelector("video")?.play().catch(() => {})}
+                onMouseLeave={(e) => e.currentTarget.querySelector("video")?.pause()}
+              >
                 <div className="relative aspect-video md:aspect-[2.39/1]">
                   {film.video ? (
                     <video
@@ -45,8 +55,6 @@ export default function ScreeningRoom({ films }: { films: Film[] }) {
                       loop
                       playsInline
                       className="absolute inset-0 h-full w-full object-cover"
-                      onMouseEnter={(e) => e.currentTarget.play()}
-                      onMouseLeave={(e) => e.currentTarget.pause()}
                     />
                   ) : (
                     <Image
@@ -58,6 +66,7 @@ export default function ScreeningRoom({ films }: { films: Film[] }) {
                     />
                   )}
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.6)_100%)]" />
+                  {playable && <PlayCue title={film.title} onPlay={() => setPlaying(film)} />}
                 </div>
               </div>
 
@@ -98,6 +107,8 @@ export default function ScreeningRoom({ films }: { films: Film[] }) {
           </Link>
         </div>
       </Reveal>
+
+      <FilmPlayer film={playing} onClose={() => setPlaying(null)} />
     </div>
   );
 }
