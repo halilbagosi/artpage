@@ -12,6 +12,7 @@ import {
 } from "./schema";
 import { imageSize } from "image-size";
 import { getSite } from "./content";
+import { videoEmbed } from "./video";
 
 /**
  * Disk access for the local dashboard. Everything here writes into content/
@@ -150,6 +151,9 @@ function cleanFields(collection: CollectionKey, input: Record<string, unknown>) 
           : "";
     if (field.type === "media" && value && !value.startsWith("/media/")) {
       throw new AdminError(`${field.label} must be a file from the media library`);
+    }
+    if (field.type === "url" && value && !videoEmbed(value)) {
+      throw new AdminError(`${field.label} must be a Vimeo or YouTube link`);
     }
     if (field.type === "select" && value && !field.options?.includes(value)) {
       value = "";

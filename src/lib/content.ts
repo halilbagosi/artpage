@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { imageSize } from "image-size";
 import type { SiteSettings } from "./schema";
+import { videoEmbed } from "./video";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const PUBLIC_DIR = path.join(process.cwd(), "public");
@@ -181,13 +182,20 @@ export interface Film {
   year: string;
   role: string;
   runtime: string;
+  /** Short local clip that loops muted in the frame */
   video?: string;
+  /** Vimeo or YouTube link to the full film, opened full screen on click */
+  link?: string;
   sample?: string;
 }
 
 export function getFilms(): Film[] {
   return (readCollection("videography") as unknown as Film[])
     .filter((f) => mediaExists(f.poster))
-    .map((f) => ({ ...f, video: mediaExists(f.video) ? f.video : undefined }))
+    .map((f) => ({
+      ...f,
+      video: mediaExists(f.video) ? f.video : undefined,
+      link: videoEmbed(f.link) ? f.link : undefined,
+    }))
     .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
 }

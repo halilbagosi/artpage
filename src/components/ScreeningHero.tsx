@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { Film } from "@/lib/content";
+import FilmPlayer, { isPlayable } from "./FilmPlayer";
+import PlayCue from "./PlayCue";
 
 /**
  * Opening of the Screening Room: condensed title-card type, then a dark
@@ -19,6 +21,7 @@ export default function ScreeningHero({
 }) {
   const houseRef = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const house = houseRef.current;
@@ -95,6 +98,9 @@ export default function ScreeningHero({
               </div>
               {/* Bare lamp light before the picture resolves */}
               <div aria-hidden className="lamp pointer-events-none absolute inset-0 bg-[#fff3dc]" />
+              {featured && isPlayable(featured) && (
+                <PlayCue title={featured.title} onPlay={() => setPlaying(true)} />
+              )}
             </div>
           </div>
 
@@ -121,6 +127,8 @@ export default function ScreeningHero({
           </div>
         )}
       </div>
+
+      <FilmPlayer film={playing && featured ? featured : null} onClose={() => setPlaying(false)} />
     </section>
   );
 }

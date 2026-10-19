@@ -208,7 +208,8 @@ export default function EntrySheet({
                   <input
                     id={id}
                     ref={i === 0 ? firstInput : undefined}
-                    type="text"
+                    type={field.type === "url" ? "url" : "text"}
+                    placeholder={field.type === "url" ? "https://vimeo.com/…" : undefined}
                     required={field.required}
                     value={String(value)}
                     onChange={(e) => set(field.key, e.target.value)}
