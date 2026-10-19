@@ -54,6 +54,29 @@ video: /media/my-film.mp4   # optional; plays on hover when present
 sample: 'true'              # marks placeholder entries
 ```
 
+Site-wide copy and settings (email, portrait, bio, the year photography
+started, each world's homepage cover and introduction) live in
+`content/site.json`.
+
+## Dashboard
+
+```bash
+npm run admin   # then open http://localhost:3000/admin
+```
+
+A local editor for everything above: site settings, paintings, photography,
+films, and the media library — upload, rename, replace, rotate, or delete any
+file. Renames and edits update every entry that uses the file (edits save as a
+new `-v2`, `-v3`… version so caches never show stale pixels). Deleting a file
+that's in use clears those references; entries left without their main image
+are hidden on the site until a new one is chosen. Saves go
+straight into `content/` and `public/media` — review with `git diff`, then
+commit and push to publish.
+
+It only exists under `npm run admin`: the server binds to 127.0.0.1, the API
+rejects non-loopback hosts and cross-site requests, and both `/admin` and
+`/api/admin/*` return 404 under `npm run dev` and in production builds.
+
 ## Develop
 
 ```bash

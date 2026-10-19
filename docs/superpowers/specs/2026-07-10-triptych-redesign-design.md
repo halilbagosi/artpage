@@ -36,20 +36,40 @@ Alternating editorial rows: large framed image, oversized serif title, small-cap
 placard (medium · category · month year). Grain texture overlay. Click → lightbox.
 
 ### `/photography` — The Darkroom
-Pure black, white text, monospaced metadata. Contact-sheet grid grouped by
-client; images slightly dimmed until hover, when a caption stamp slides in.
-Frame counter in the header. Click → lightbox.
+Warm black under a red safelight glow; grease-pencil red accent; wide
+(Archivo expanded) film-box type with monospaced edge print. Hero: numeral
+label, wordmark, then a hairline with the blurb and shoots/pictures/years set
+in columns, and a strip of film edge-printed with the shoot names. Each client is a "roll" printed as a contact sheet:
+35mm strips with sprocket holes and edge-print frame numbers, frames at each
+photo's true aspect ratio. Prints "develop" up from black as they scroll into
+view; hover draws a grease-pencil selection box. Click → lightbox.
+*(Revised 2026-10-05.)*
 
 ### `/film` — The Screening Room
-Near-black with cinema-red accent, condensed uppercase type. 2.39:1 letterboxed
-frames, one large per scroll section, slow Ken Burns zoom on the poster, title
-card beneath ("directed by …"). Optional `video:` frontmatter plays on hover
-when present. Ships with two clearly-marked sample entries (no real film content
-exists yet).
+House-lights-down black with marquee-gold accent and velvet crimson;
+extra-condensed uppercase (Archivo) title cards. Hero: numeral label and
+title above a proscenium whose velvet curtains part (once in view) onto the
+featured film; when the house scrolls into view the projector turns on (lamp
+strike, room catches the light, picture pulls into focus). A hairline caption
+beneath reads "Now showing · title · year · runtime". Programme: each film
+is a numbered reel — 2.39:1 letterboxed frame (Ken Burns poster, video plays
+on hover when `video:` is set), condensed title
+card, and end-credits-style role/year/runtime. Closes on a "Fin." card with
+"Request a session", linking to /about#contact. Ships with two clearly-marked sample entries. *(Revised 2026-10-05.)*
 
 ### `/about`
-Quiet ivory page: portrait, short bio, contact links. Replaces the separate
-contact page.
+Quiet ivory page that blends the three rooms: the name with "Painter ·
+Photographer · Filmmaker" each set in its room's type, portrait and bio with
+stats, a preview card per room rendered in that room's own palette (scoped
+`data-world`), and a contact section with one enquiry per discipline.
+*(Revised 2026-10-05.)*
+
+### `/admin` — local dashboard
+Run with `npm run admin`. Edits `content/site.json`, the three collections and
+`public/media` on disk; 404 everywhere else.
+
+All labels (eyebrows, metadata, credits) share one `type-label` utility:
+11px mono, uppercase, 0.14em tracking.
 
 ## Shared chrome
 

@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-const SWITCHER = [
+const NAV = [
   { href: "/art", label: "Art" },
   { href: "/photography", label: "Photo" },
   { href: "/film", label: "Film" },
+  { href: "/about", label: "About" },
 ];
 
 /**
@@ -44,40 +45,35 @@ export default function WorldShell({
             HB<span className="text-world-accent">.</span>
           </Link>
           <nav className="flex items-center gap-4 md:gap-7">
-            {SWITCHER.map((item) => {
+            {NAV.map((item) => {
               const active = pathname === item.href;
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={clsx(
-                    "font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity md:text-[11px] md:tracking-[0.25em]",
-                    active
-                      ? "text-world-ink"
-                      : "text-world-muted hover:text-world-ink"
+                <Fragment key={item.href}>
+                  {item.href === "/about" && (
+                    <span aria-hidden className="h-3 w-px bg-world-hairline" />
                   )}
-                >
-                  {item.label}
-                  <span
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
                     className={clsx(
-                      "mt-1 block h-px bg-world-accent transition-transform origin-left",
-                      active ? "scale-x-100" : "scale-x-0"
+                      "relative py-1 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors md:text-[11px]",
+                      active
+                        ? "text-world-ink"
+                        : "text-world-muted hover:text-world-ink"
                     )}
-                  />
-                </Link>
+                  >
+                    {item.label}
+                    {/* Out of flow, so every item shares one baseline */}
+                    <span
+                      className={clsx(
+                        "absolute inset-x-0 -bottom-0.5 h-px origin-left bg-world-accent transition-transform duration-300",
+                        active ? "scale-x-100" : "scale-x-0"
+                      )}
+                    />
+                  </Link>
+                </Fragment>
               );
             })}
-            <Link
-              href="/about"
-              className={clsx(
-                "font-mono text-[10px] uppercase tracking-[0.2em] transition-opacity md:text-[11px] md:tracking-[0.25em]",
-                pathname === "/about"
-                  ? "text-world-ink"
-                  : "text-world-muted hover:text-world-ink"
-              )}
-            >
-              About
-            </Link>
           </nav>
         </div>
       </header>
@@ -87,7 +83,7 @@ export default function WorldShell({
       <footer className="border-t border-world-hairline px-5 py-8 md:px-10">
         <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
           <span className="font-serif text-lg">Halil Bagosi</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-world-muted">
+          <span className="type-label text-world-muted">
             Art · Photography · Film — {new Date().getFullYear()}
           </span>
         </div>
