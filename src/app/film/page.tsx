@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getFilms } from "@/lib/content";
+import { getFilms, getSite } from "@/lib/content";
 import WorldShell from "@/components/WorldShell";
-import WorldHero from "@/components/WorldHero";
+import ScreeningHero from "@/components/ScreeningHero";
 import ScreeningRoom from "@/components/ScreeningRoom";
 
 export const metadata: Metadata = {
@@ -16,12 +16,7 @@ export default function FilmPage() {
   return (
     <WorldShell world="film">
       <div className="grain">
-        <WorldHero
-          numeral="III"
-          title="The Screening Room"
-          subtitle="Film"
-          blurb="Directed and photographed motion work, presented letterboxed the way it should be seen — lights down, sound up."
-        />
+        <ScreeningHero featured={films[0]} blurb={getSite().worlds.film.blurb} />
         <ScreeningRoom films={films} />
       </div>
     </WorldShell>

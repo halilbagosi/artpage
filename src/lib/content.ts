@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { imageSize } from "image-size";
+import type { SiteSettings } from "./schema";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const PUBLIC_DIR = path.join(process.cwd(), "public");
@@ -17,6 +18,15 @@ function imageAspect(publicPath: string): number | null {
   }
 }
 
+/** True when a /media/… path points at a file that exists under public/. */
+function mediaExists(publicPath: string | undefined): publicPath is string {
+  return (
+    !!publicPath &&
+    publicPath.startsWith("/media/") &&
+    fs.existsSync(path.join(PUBLIC_DIR, publicPath))
+  );
+}
+
 /** Minimal frontmatter parser — the collections only use flat `key: value` pairs. */
 function parseFrontmatter(raw: string): Record<string, string> {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -27,8 +37,12 @@ function parseFrontmatter(raw: string): Record<string, string> {
     if (idx === -1) continue;
     const key = line.slice(0, idx).trim();
     let value = line.slice(idx + 1).trim();
-    // Strip surrounding quotes and stray characters like `']2025'`
-    value = value.replace(/^['"]|['"]$/g, "").replace(/^\]/, "").trim();
+    // Unquote YAML-style scalars ('' escapes a single quote inside '…')
+    if (/^'.*'$/.test(value)) value = value.slice(1, -1).replace(/''/g, "'");
+    else if (/^".*"$/.test(value)) value = value.slice(1, -1).replace(/\\"/g, '"');
+    else value = value.replace(/^['"]|['"]$/g, "");
+    // Stray characters left by an old CMS, like `']2025'`
+    value = value.replace(/^\]/, "").trim();
     if (key) data[key] = value;
   }
   return data;
@@ -46,6 +60,57 @@ function readCollection(name: string): Record<string, string>[] {
       data.slug = f.replace(/\.md$/, "");
       return data;
     });
+}
+
+const SITE_DEFAULTS: SiteSettings = {
+  email: "",
+  photographySince: new Date().getFullYear(),
+  portrait: "",
+  bio: "",
+  worlds: {
+    art: { cover: "", blurb: "" },
+    photography: { cover: "", blurb: "" },
+    film: { cover: "", blurb: "" },
+  },
+};
+
+/** Site-wide copy and settings from content/site.json (edited via /admin). */
+export function getSite(): SiteSettings {
+  let data: Partial<SiteSettings> = {};
+  try {
+    data = JSON.parse(fs.readFileSync(path.join(CONTENT_DIR, "site.json"), "utf8"));
+  } catch {
+    // Missing or malformed: fall back to defaults
+  }
+  return {
+    ...SITE_DEFAULTS,
+    ...data,
+    worlds: {
+      art: { ...SITE_DEFAULTS.worlds.art, ...data.worlds?.art },
+      photography: { ...SITE_DEFAULTS.worlds.photography, ...data.worlds?.photography },
+      film: { ...SITE_DEFAULTS.worlds.film, ...data.worlds?.film },
+    },
+  };
+}
+
+/** Site settings with any image that no longer exists blanked out, for rendering. */
+export function getSiteForDisplay(): SiteSettings {
+  const site = getSite();
+  const keep = (url: string) => (mediaExists(url) ? url : "");
+  return {
+    ...site,
+    portrait: keep(site.portrait),
+    worlds: {
+      art: { ...site.worlds.art, cover: keep(site.worlds.art.cover) },
+      photography: { ...site.worlds.photography, cover: keep(site.worlds.photography.cover) },
+      film: { ...site.worlds.film, cover: keep(site.worlds.film.cover) },
+    },
+  };
+}
+
+/** Whole years since photography work began. */
+export function photographyYears(site: SiteSettings = getSite()): number {
+  return Math.max(0, new Date().getFullYear() - Number(site.photographySince || 0));
 }
 
 const MONTH_ORDER = [
@@ -70,6 +135,8 @@ export interface Painting {
 
 export function getPaintings(): Painting[] {
   return (readCollection("paintings") as unknown as Painting[])
+    // An entry whose image was removed stays in content/ but isn't shown
+    .filter((p) => mediaExists(p.image))
     .map((p) => ({ ...p, aspect: imageAspect(p.image) ?? 4 / 5 }))
     .sort((a, b) => {
     const yearDiff = Number(b.year || 0) - Number(a.year || 0);
@@ -87,11 +154,15 @@ export interface Photograph {
   image: string;
   client: string;
   category: string;
+  /** width / height of the photograph; contact-sheet frames render at this ratio */
+  aspect: number;
 }
 
 /** Photographs grouped by client, preserving alphabetical client order. */
 export function getPhotographsByClient(): { client: string; photos: Photograph[] }[] {
-  const photos = readCollection("photography") as unknown as Photograph[];
+  const photos = (readCollection("photography") as unknown as Photograph[])
+    .filter((p) => mediaExists(p.image))
+    .map((p) => ({ ...p, aspect: imageAspect(p.image) ?? 3 / 2 }));
   const groups = new Map<string, Photograph[]>();
   for (const photo of photos) {
     const client = photo.client?.trim() || "Personal Work";
@@ -115,7 +186,8 @@ export interface Film {
 }
 
 export function getFilms(): Film[] {
-  return (readCollection("videography") as unknown as Film[]).sort(
-    (a, b) => Number(b.year || 0) - Number(a.year || 0)
-  );
+  return (readCollection("videography") as unknown as Film[])
+    .filter((f) => mediaExists(f.poster))
+    .map((f) => ({ ...f, video: mediaExists(f.video) ? f.video : undefined }))
+    .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
 }

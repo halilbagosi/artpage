@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getPhotographsByClient } from "@/lib/content";
+import { getPhotographsByClient, getSite, photographyYears } from "@/lib/content";
 import WorldShell from "@/components/WorldShell";
-import WorldHero from "@/components/WorldHero";
+import DarkroomHero from "@/components/DarkroomHero";
 import DarkroomGallery from "@/components/DarkroomGallery";
 
 export const metadata: Metadata = {
@@ -13,16 +13,19 @@ export const metadata: Metadata = {
 export default function PhotographyPage() {
   const groups = getPhotographsByClient();
   const total = groups.reduce((n, g) => n + g.photos.length, 0);
+  const site = getSite();
 
   return (
     <WorldShell world="photography">
-      <WorldHero
-        numeral="II"
-        title="The Darkroom"
-        subtitle={`Photography — ${total} frames`}
-        blurb="Commercial and editorial frames, printed dark and viewed like a contact sheet. Hover a frame to read its stamp; click to enlarge."
-      />
-      <DarkroomGallery groups={groups} />
+      <div className="safelight">
+        <DarkroomHero
+          shoots={groups.map((g) => g.client)}
+          pictures={total}
+          years={photographyYears(site)}
+          blurb={site.worlds.photography.blurb}
+        />
+        <DarkroomGallery groups={groups} />
+      </div>
     </WorldShell>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Inter, Playfair_Display, JetBrains_Mono, Archivo } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,6 +10,14 @@ const inter = Inter({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+});
+
+// Variable width axis: expanded for the Darkroom (film-box type), condensed for
+// the Screening Room (title cards)
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  axes: ["wdth"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -35,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} ${jetbrains.variable} antialiased`}
+      className={`${inter.variable} ${playfair.variable} ${jetbrains.variable} ${archivo.variable} antialiased`}
     >
       <body className="min-h-screen font-sans">{children}</body>
     </html>

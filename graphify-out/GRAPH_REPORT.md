@@ -1,16 +1,16 @@
-# Graph Report - artpage  (2026-07-11)
+# Graph Report - artpage  (2026-10-05)
 
 ## Corpus Check
-- 34 files · ~1,148,308 words
+- 54 files · ~1,157,968 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 148 nodes · 166 edges · 24 communities (20 shown, 4 thin omitted)
+- 277 nodes · 549 edges · 23 communities (20 shown, 3 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `014fdd58`
+- Built from commit: `3f0e0d1b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,87 +24,94 @@
 - devDependencies
 - Artpage — Triptych
 - layout.tsx
-- Gateway.tsx
 - eslint.config.mjs
 - next.config.ts
 - postcss.config.mjs
 
 ## God Nodes (most connected - your core abstractions)
-1. `compilerOptions` - 16 edges
-2. `Scope by area` - 8 edges
-3. `Triptych Redesign — Design Spec (2026-07-10)` - 7 edges
-4. `Reveal()` - 6 edges
-5. `getPaintings()` - 6 edges
-6. `Portfolio Polish & Bug Fix — Design` - 6 edges
-7. `Pages` - 6 edges
-8. `scripts` - 5 edges
-9. `readCollection()` - 5 edges
-10. `Artpage — Triptych` - 5 edges
+1. `guard()` - 19 edges
+2. `errorResponse()` - 17 edges
+3. `compilerOptions` - 16 edges
+4. `getSite()` - 13 edges
+5. `mediaKind` - 13 edges
+6. `replaceReferences()` - 12 edges
+7. `updateEntry()` - 9 edges
+8. `readAll()` - 9 edges
+9. `getPaintings()` - 9 edges
+10. `MediaFile` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `ArtPage()` --calls--> `getPaintings()`  [EXTRACTED]
-  src/app/art/page.tsx → src/lib/content.ts
-- `FilmPage()` --calls--> `getFilms()`  [EXTRACTED]
-  src/app/film/page.tsx → src/lib/content.ts
-- `PhotographyPage()` --calls--> `getPhotographsByClient()`  [EXTRACTED]
-  src/app/photography/page.tsx → src/lib/content.ts
+- `AdminPage()` --calls--> `readAll()`  [EXTRACTED]
+  src/app/admin/page.tsx → src/lib/admin.ts
+- `Home()` --calls--> `getSiteForDisplay()`  [EXTRACTED]
+  src/app/page.tsx → src/lib/content.ts
+- `MediaPicker()` --calls--> `uploadFiles()`  [EXTRACTED]
+  src/components/admin/MediaPicker.tsx → src/components/admin/ui.tsx
+- `cleanFields()` --calls--> `fieldsOf()`  [EXTRACTED]
+  src/lib/admin.ts → src/lib/schema.ts
+- `saveSite()` --calls--> `getSite()`  [EXTRACTED]
+  src/lib/admin.ts → src/lib/content.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (24 total, 4 thin omitted)
+## Communities (23 total, 3 thin omitted)
 
 ### Community 0 - "content.ts"
-Cohesion: 0.15
-Nodes (17): ArtPage(), metadata, FilmPage(), metadata, metadata, PhotographyPage(), WorldHero(), SWITCHER (+9 more)
+Cohesion: 0.07
+Nodes (38): AboutPage(), mailto(), metadata, plural(), ArtPage(), metadata, FilmPage(), metadata (+30 more)
 
 ### Community 1 - "compilerOptions"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 2 - "AtelierGallery.tsx"
-Cohesion: 0.16
-Nodes (9): metadata, AtelierGallery(), placard(), DarkroomGallery(), LightboxItem, Reveal(), Film, Painting (+1 more)
+Cohesion: 0.10
+Nodes (51): GET(), POST(), Context, DELETE(), PUT(), target(), Context, DELETE() (+43 more)
 
 ### Community 3 - "package.json"
-Cohesion: 0.11
-Nodes (17): devDependencies, eslint, eslint-config-next, tailwindcss, @tailwindcss/postcss, @types/node, @types/react, @types/react-dom (+9 more)
+Cohesion: 0.07
+Nodes (26): dependencies, clsx, framer-motion, image-size, next, react, react-dom, sharp (+18 more)
 
 ### Community 4 - "Scope by area"
 Cohesion: 0.14
 Nodes (13): About + Contact, Bugs to fix, Decisions (locked), Global mobile pass, Goal, Lightbox (new, shared), Out of scope, Painting world (+5 more)
 
 ### Community 5 - "Triptych Redesign — Design Spec (2026-07-10)"
-Cohesion: 0.15
-Nodes (12): `/about`, Architecture, `/art` — The Atelier, Content model, `/film` — The Screening Room, `/` — Gateway, Goal, Pages (+4 more)
+Cohesion: 0.14
+Nodes (13): `/about`, `/admin` — local dashboard, Architecture, `/art` — The Atelier, Content model, `/film` — The Screening Room, `/` — Gateway, Goal (+5 more)
 
 ### Community 6 - "devDependencies"
-Cohesion: 0.29
-Nodes (7): dependencies, clsx, framer-motion, image-size, next, react, react-dom
+Cohesion: 0.09
+Nodes (42): AdminPage(), metadata, CollectionGrid(), Dashboard(), entryMeta(), Section, sectionLabel(), EntrySheet() (+34 more)
 
 ### Community 7 - "Artpage — Triptych"
-Cohesion: 0.33
-Nodes (5): Architecture, Artpage — Triptych, Content model, Develop, The worlds
+Cohesion: 0.29
+Nodes (6): Architecture, Artpage — Triptych, Content model, Dashboard, Develop, The worlds
 
 ### Community 8 - "layout.tsx"
-Cohesion: 0.33
-Nodes (4): inter, jetbrains, metadata, playfair
+Cohesion: 0.29
+Nodes (5): archivo, inter, jetbrains, metadata, playfair
 
 ## Knowledge Gaps
-- **77 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+72 more)
+- **98 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+93 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dependencies` connect `devDependencies` to `package.json`?**
+- **Why does `getSite()` connect `content.ts` to `AtelierGallery.tsx`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `guard()` connect `AtelierGallery.tsx` to `devDependencies`?**
   _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _77 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _98 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `content.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.07422559906487435 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+- **Should `AtelierGallery.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.10227936879018118 - nodes in this community are weakly interconnected._
 - **Should `package.json` be split into smaller, more focused modules?**
-  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
-- **Should `Scope by area` be split into smaller, more focused modules?**
-  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._

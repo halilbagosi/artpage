@@ -11,6 +11,18 @@
   --font-serif: var(--font-playfair);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
+  --font-grotesk: var(--font-archivo);
+}
+
+/* The one small-caps label treatment used for eyebrows, metadata and credits.
+   Small text gets modest positive tracking — wide enough to read as a label,
+   tight enough to still read as a word. */
+@utility type-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 @layer base {
@@ -34,24 +46,24 @@
     --world-hairline: rgba(34, 29, 24, 0.14);
   }
 
-  /* The Darkroom — OLED black, silver print */
+  /* The Darkroom — warm black under a red safelight, grease-pencil accent */
   [data-world="photography"] {
-    --world-bg: #000000;
-    --world-surface: #101010;
-    --world-ink: #f5f5f5;
-    --world-muted: #8b8b8b;
-    --world-accent: #e0e0e0;
-    --world-hairline: rgba(245, 245, 245, 0.14);
+    --world-bg: #0a0807;
+    --world-surface: #17110f;
+    --world-ink: #f2ece6;
+    --world-muted: #8f847c;
+    --world-accent: #ff4a2e;
+    --world-hairline: rgba(242, 236, 230, 0.12);
   }
 
-  /* The Screening Room — near-black, cinema red */
+  /* The Screening Room — house-lights-down black, projector light, marquee gold */
   [data-world="film"] {
-    --world-bg: #0a0a0c;
-    --world-surface: #131318;
-    --world-ink: #ecebe8;
-    --world-muted: #85838d;
-    --world-accent: #c8402e;
-    --world-hairline: rgba(236, 235, 232, 0.13);
+    --world-bg: #09080a;
+    --world-surface: #141216;
+    --world-ink: #efe9df;
+    --world-muted: #8a8490;
+    --world-accent: #e9b45c;
+    --world-hairline: rgba(239, 233, 223, 0.12);
   }
 
   /* Quiet ivory for about */
@@ -128,11 +140,148 @@
     to { transform: scale(1.1) translate(1.5%, -1.5%); }
   }
 
+  /* ——— The Darkroom ——— */
+
+  /* Red safelight pooling from the top corner of the room */
+  .safelight {
+    isolation: isolate;
+  }
+  .safelight::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 45% at 88% -8%, rgba(255, 58, 30, 0.2), transparent 70%),
+      radial-gradient(45% 35% at -5% 105%, rgba(255, 58, 30, 0.07), transparent 70%);
+  }
+
+  /* Rounded sprocket holes punched through a strip of film; the band's
+     background is the colour that shows through the holes */
+  .sprockets {
+    height: 8px;
+    background: var(--world-surface);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8'%3E%3Crect x='3.5' width='7' height='8' rx='1.5'/%3E%3C/svg%3E")
+      0 0 / 14px 8px repeat-x;
+  }
+
+  /* Prints come up out of the developer as they scroll into view */
+  @supports (animation-timeline: view()) {
+    .develop {
+      animation: develop linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+
+  @keyframes develop {
+    from {
+      filter: brightness(0.06) contrast(0.6) sepia(0.7) saturate(0.4);
+    }
+    to {
+      filter: none;
+    }
+  }
+
+  /* Grease-pencil selection mark, drawn on hover/focus. The stroke is
+     non-scaling, so dashes are in screen pixels: 2400px outruns any frame. */
+  .grease-mark path {
+    stroke: var(--world-accent);
+    stroke-dasharray: 2400;
+    stroke-dashoffset: 2400;
+    transition: stroke-dashoffset 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .group:hover .grease-mark path,
+  .group:focus-visible .grease-mark path {
+    stroke-dashoffset: 0;
+  }
+
+  .film-ticker {
+    animation: film-ticker 60s linear infinite;
+  }
+
+  @keyframes film-ticker {
+    to { transform: translateX(-50%); }
+  }
+
+  /* ——— The Screening Room ——— */
+
+  /* Projector turn-on, played once the house is in view (data-on): the lamp
+     strikes and settles, the room catches its light, then the picture comes
+     up out of the glare and pulls into focus. */
+  .house .lamp,
+  .house .picture,
+  .house .room-light {
+    opacity: 0;
+  }
+
+  .house[data-on] .lamp {
+    animation: lamp-strike 2.4s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .house[data-on] .room-light {
+    animation: room-light 2.4s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  .house[data-on] .picture {
+    animation: picture-focus 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both;
+  }
+
+  @keyframes lamp-strike {
+    0% { opacity: 0; }
+    7% { opacity: 0.55; }
+    12% { opacity: 0.12; }
+    22% { opacity: 0.9; }
+    45% { opacity: 0.85; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes room-light {
+    0% { opacity: 0; }
+    7% { opacity: 0.5; }
+    12% { opacity: 0.1; }
+    22% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes picture-focus {
+    from {
+      opacity: 0;
+      filter: blur(14px) brightness(1.6);
+      transform: scale(1.04);
+    }
+    to {
+      opacity: 1;
+      filter: none;
+      transform: none;
+    }
+  }
+
+  /* Rows of seat backs silhouetted against the screen */
+  .seats {
+    background:
+      radial-gradient(ellipse 26px 30px at 50% 100%, #050406 97%, transparent 100%) 0 100% / 60px 44px repeat-x,
+      radial-gradient(ellipse 26px 30px at 50% 100%, #0b090c 97%, transparent 100%) 30px 0 / 60px 30px repeat-x;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .grain::after,
     .kenburns,
-    .reveal {
+    .reveal,
+    .develop,
+    .film-ticker,
+    .house[data-on] .lamp,
+    .house[data-on] .room-light,
+    .house[data-on] .picture {
       animation: none;
+    }
+    .house .picture,
+    .house .room-light {
+      opacity: 1;
+    }
+    .grease-mark path {
+      transition: none;
     }
   }
 }

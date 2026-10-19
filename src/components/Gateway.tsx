@@ -12,7 +12,6 @@ const WORLDS = [
     label: "Art",
     numeral: "I",
     tagline: "The Atelier",
-    image: "/media/FullSizeRender.jpg",
     bg: "#f5f1e8",
   },
   {
@@ -21,8 +20,7 @@ const WORLDS = [
     label: "Photography",
     numeral: "II",
     tagline: "The Darkroom",
-    image: "/media/P1155212.jpg",
-    bg: "#000000",
+    bg: "#0a0807",
   },
   {
     key: "film",
@@ -30,12 +28,16 @@ const WORLDS = [
     label: "Film",
     numeral: "III",
     tagline: "The Screening Room",
-    image: "/media/P1144772.jpg",
-    bg: "#0a0a0c",
+    bg: "#09080a",
   },
 ] as const;
 
-export default function Gateway() {
+export default function Gateway({
+  covers,
+}: {
+  /** Cover image per world, from site settings */
+  covers: Record<(typeof WORLDS)[number]["key"], string>;
+}) {
   const router = useRouter();
   const [hovered, setHovered] = useState<string | null>(null);
   const [entering, setEntering] = useState<(typeof WORLDS)[number] | null>(null);
@@ -89,14 +91,16 @@ export default function Gateway() {
               }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Image
-                src={world.image}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-                className="object-cover"
-              />
+              {covers[world.key] && (
+                <Image
+                  src={covers[world.key]}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  className="object-cover"
+                />
+              )}
             </motion.div>
 
             {/* Caption scrim */}

@@ -6,6 +6,10 @@ import type { Photograph } from "@/lib/content";
 import Reveal from "./Reveal";
 import Lightbox, { type LightboxItem } from "./Lightbox";
 
+/** Hand-drawn box, slightly overshooting where the pencil started. */
+const GREASE_PATH =
+  "M4,7 C28,3 66,5 97,3 C98,34 96,68 98,96 C66,98 31,96 3,97 C2,70 4,36 2,5 C9,4 14,6 19,9";
+
 export default function DarkroomGallery({
   groups,
 }: {
@@ -13,7 +17,7 @@ export default function DarkroomGallery({
 }) {
   const [open, setOpen] = useState<LightboxItem | null>(null);
 
-  // Running frame number across all groups, computed without render-time mutation
+  // Running frame number across all shoots, computed without render-time mutation
   const groupOffsets: number[] = [];
   groups.reduce((offset, group, i) => {
     groupOffsets[i] = offset;
@@ -21,57 +25,98 @@ export default function DarkroomGallery({
   }, 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-24 md:px-10">
+    <div className="mx-auto max-w-7xl px-5 pb-24 pt-10 md:px-10 md:pt-16">
       {groups.map((group, groupIndex) => (
-        <section key={group.client} className="py-10 md:py-14">
-          <Reveal>
-            <div className="mb-6 flex items-baseline justify-between border-b border-world-hairline pb-3">
-              <h2 className="font-serif text-2xl md:text-3xl">{group.client}</h2>
-              <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-world-muted">
-                {group.photos.length} frame{group.photos.length > 1 ? "s" : ""}
-              </span>
-            </div>
-          </Reveal>
+        <section key={group.client} className="py-8 md:py-12">
+          {/* Contact sheet: one sheet of paper per shoot */}
+          <div className="rounded-[2px] bg-world-surface p-4 shadow-[0_30px_80px_-40px_rgba(255,58,30,0.25)] md:p-8">
+            <Reveal>
+              <header className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-world-hairline pb-4 md:mb-8">
+                <div>
+                  <div className="type-label text-world-accent">
+                    Shoot {String(groupIndex + 1).padStart(2, "0")}
+                  </div>
+                  <h2 className="mt-2 font-grotesk text-xl font-bold uppercase tracking-[-0.02em] font-stretch-expanded md:text-3xl">
+                    {group.client}
+                  </h2>
+                </div>
+                <span className="type-label text-world-muted">
+                  {group.photos.length} picture{group.photos.length > 1 ? "s" : ""}
+                </span>
+              </header>
+            </Reveal>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {group.photos.map((photo, photoIndex) => {
-              const frame = groupOffsets[groupIndex] + photoIndex + 1;
-              const stamp = `№ ${String(frame).padStart(3, "0")}`;
-              return (
-                <Reveal key={photo.slug}>
-                  <button
-                    onClick={() =>
-                      setOpen({
-                        image: photo.image,
-                        title: photo.title,
-                        meta: [photo.client, photo.category]
-                          .filter(Boolean)
-                          .join(" · "),
-                      })
-                    }
-                    className="group relative block w-full cursor-zoom-in overflow-hidden bg-world-surface"
-                    aria-label={`View ${photo.title}`}
-                  >
-                    <div className="relative aspect-4/3">
-                      <Image
-                        src={photo.image}
-                        alt={photo.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover brightness-90 transition-all duration-500 group-hover:scale-[1.02] group-hover:brightness-100"
-                      />
-                    </div>
-                    {/* Contact-sheet stamp on hover */}
-                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/85 px-4 py-3 transition-transform duration-400 md:translate-y-full md:group-hover:translate-y-0">
-                      <span className="text-sm text-white">{photo.title}</span>
-                      <span className="font-mono text-[10px] tracking-[0.25em] text-white/50">
-                        {stamp}
-                      </span>
-                    </div>
-                  </button>
-                </Reveal>
-              );
-            })}
+            {/* Strips of film, cut where they wrap */}
+            <div className="flex flex-wrap gap-y-8">
+              {group.photos.map((photo, photoIndex) => {
+                const frame = groupOffsets[groupIndex] + photoIndex + 1;
+                const n = String(frame).padStart(2, "0");
+                return (
+                  <figure key={photo.slug} className="max-w-full">
+                    <button
+                      onClick={() =>
+                        setOpen({
+                          image: photo.image,
+                          title: photo.title,
+                          meta: [`Frame ${n}`, photo.client, photo.category]
+                            .filter(Boolean)
+                            .join(" · "),
+                        })
+                      }
+                      className="group relative block max-w-full cursor-zoom-in bg-[#040303] px-[5px] pb-7 pt-[18px] outline-none"
+                      aria-label={`View ${photo.title}`}
+                    >
+                      <div className="sprockets absolute inset-x-0 top-[5px]" />
+
+                      <div
+                        className="relative h-[220px] max-w-full overflow-visible sm:h-[250px] lg:h-[300px]"
+                        style={{ aspectRatio: photo.aspect }}
+                      >
+                        <div className="absolute inset-0 overflow-hidden">
+                          <Image
+                            src={photo.image}
+                            alt={photo.title}
+                            fill
+                            sizes="(max-width: 640px) 90vw, 420px"
+                            className="develop object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                          />
+                        </div>
+                        <svg
+                          aria-hidden
+                          viewBox="0 0 100 100"
+                          preserveAspectRatio="none"
+                          className="grease-mark pointer-events-none absolute -inset-2 h-[calc(100%+1rem)] w-[calc(100%+1rem)] overflow-visible"
+                        >
+                          <path
+                            d={GREASE_PATH}
+                            fill="none"
+                            strokeWidth={3}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </svg>
+                      </div>
+
+                      {/* Edge print */}
+                      <div className="absolute inset-x-0 bottom-[15px] flex justify-between px-2.5 font-mono text-[8px] leading-none tracking-[0.2em] text-[#f0dcc8]/50">
+                        <span>{n}</span>
+                        <span>▸ {n}A</span>
+                      </div>
+                      <div className="sprockets absolute inset-x-0 bottom-[4px]" />
+                    </button>
+
+                    <figcaption className="type-label mt-3 px-1.5">
+                      <span className="text-world-accent">{n}</span>{" "}
+                      <span className="text-world-ink/85">{photo.title}</span>
+                      {photo.category && (
+                        <span className="block text-world-muted">{photo.category}</span>
+                      )}
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
           </div>
         </section>
       ))}
