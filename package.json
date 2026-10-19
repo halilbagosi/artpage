@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "build:pages": "STATIC_EXPORT=1 next build"
+    "build:pages": "node scripts/build-pages.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
