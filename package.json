@@ -6,7 +6,8 @@
     "dev": "node scripts/convert-heic.mjs && tinacms dev -c \"next dev --hostname 0.0.0.0\"",
     "build": "node scripts/convert-heic.mjs && tinacms build && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:pages": "node scripts/convert-heic.mjs && tinacms build --local --skip-cloud-checks --noTelemetry -c \"node scripts/export-content.mjs\" && STATIC_EXPORT=1 NEXT_PUBLIC_STATIC_CONTENT=1 next build"
   },
   "dependencies": {
     "@samasante/liquid-glass": "^0.1.1",
