@@ -29,6 +29,7 @@ export default function ShootGroups({
   onSaved: (message: string) => Promise<void>;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,84 +82,148 @@ export default function ShootGroups({
   const selecting = selected.size > 0;
 
   return (
-    <div className="space-y-12 pb-24">
+    <div className="space-y-8 pb-24">
+      <div className="-mb-2 flex justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            setCollapsed(
+              collapsed.size === shoots.length ? new Set() : new Set(shoots.map(([c]) => c))
+            )
+          }
+          className="text-[13px] text-world-muted underline decoration-world-hairline underline-offset-4 transition-colors hover:text-world-ink"
+        >
+          {collapsed.size === shoots.length ? "Expand all" : "Collapse all"}
+        </button>
+      </div>
+
       {shoots.map(([client, photos]) => {
         const slugs = photos.map((p) => p.slug);
-        const all = slugs.every((s) => selected.has(s));
+        const picked = slugs.filter((s) => selected.has(s)).length;
+        const all = picked === slugs.length;
         const type = shootTypeLabel(photos);
+        const open = !collapsed.has(client);
+        const listId = `shoot-${slugs[0]}`;
         return (
-          <section key={client} aria-label={client}>
-            <header className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-world-hairline pb-3">
-              <h2 className="font-serif text-2xl tracking-[-0.01em]">{client}</h2>
-              <span className="text-[13px] tabular-nums text-world-muted">{photos.length}</span>
-              <span
-                className={clsx(
-                  "rounded-full px-2.5 py-0.5 text-[12px] font-medium",
-                  type === "Uncategorised" || type === "Mixed"
-                    ? "border border-dashed border-world-hairline text-world-muted"
-                    : "bg-world-surface text-world-ink"
-                )}
+          <section
+            key={client}
+            aria-label={client}
+            className="rounded-2xl border border-world-hairline bg-white/40 px-4 py-3 md:px-5"
+          >
+            <header className="flex flex-wrap items-center gap-x-3 gap-y-2 py-1">
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls={listId}
+                onClick={() =>
+                  setCollapsed((current) => {
+                    const next = new Set(current);
+                    if (open) next.add(client);
+                    else next.delete(client);
+                    return next;
+                  })
+                }
+                className="-ml-1 flex min-w-0 basis-full items-center gap-3 sm:basis-0 sm:flex-1 rounded-lg px-1 py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-world-accent"
               >
-                {type}
-              </span>
+                <svg
+                  aria-hidden
+                  viewBox="0 0 12 12"
+                  className={clsx(
+                    "h-3.5 w-3.5 shrink-0 text-world-muted transition-transform duration-300",
+                    !open && "-rotate-90"
+                  )}
+                >
+                  <path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <h2 className="truncate font-serif text-xl tracking-[-0.01em] md:text-2xl">{client}</h2>
+                <span className="text-[13px] tabular-nums text-world-muted">{photos.length}</span>
+                <span
+                  className={clsx(
+                    "shrink-0 rounded-full px-2.5 py-0.5 text-[12px] font-medium",
+                    type === "Uncategorised" || type === "Mixed"
+                      ? "border border-dashed border-world-hairline text-world-muted"
+                      : "bg-world-surface text-world-ink"
+                  )}
+                >
+                  {type}
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => toggle(slugs, !all)}
-                className={`${buttonClass.secondary} ml-auto px-3 py-1 text-[13px]`}
+                className={`${buttonClass.secondary} ml-6 px-3 py-1 text-[13px] sm:ml-0`}
               >
-                {all ? "Deselect shoot" : "Select shoot"}
+                {all
+                  ? "Deselect all"
+                  : picked
+                    ? `Select all photos (${picked}/${slugs.length})`
+                    : "Select all photos"}
               </button>
             </header>
 
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-              {photos.map((entry) => {
-                const isSelected = selected.has(entry.slug);
-                return (
-                  <li key={entry.slug} className="group relative min-w-0">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        selecting ? toggle([entry.slug], !isSelected) : onOpen(entry)
-                      }
-                      className="block w-full text-left outline-none"
-                    >
-                      {entry.image ? (
-                        <MediaThumb
-                          url={entry.image}
-                          kind="image"
-                          className={clsx(
-                            "aspect-4/3 rounded-lg ring-offset-2 ring-offset-world-bg transition-transform duration-200 group-active:scale-[0.98] group-focus-visible:ring-2 group-focus-visible:ring-world-accent",
-                            isSelected && "ring-2 ring-world-accent"
-                          )}
-                        />
-                      ) : (
-                        <div className="grid aspect-4/3 place-items-center rounded-lg border border-dashed border-world-hairline text-[12px] text-world-muted">
-                          No image
-                        </div>
-                      )}
-                      <p className={clsx("mt-2 truncate text-[13px] font-medium", !entry.title && "text-world-muted")}>
-                        {entry.title || "Untitled"}
-                      </p>
-                      <p className="truncate text-[12px] text-world-muted">
-                        {[entry.shootType, entry.category].filter(Boolean).join(" · ") || "—"}
-                      </p>
-                    </button>
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => toggle([entry.slug], e.target.checked)}
-                      aria-label={`Select ${entry.title || entry.slug}`}
-                      className={clsx(
-                        "absolute left-2 top-2 h-5 w-5 cursor-pointer accent-[var(--world-accent)] transition-opacity",
-                        isSelected || selecting
-                          ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                      )}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
+            <AnimatePresence initial={false}>
+              {open && (
+                <motion.div
+                  id={listId}
+                  // Padding keeps the selection ring clear of the clip
+                  className="-mx-1 overflow-hidden px-1"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                >
+                  <ul className="mt-3 grid border-t border-world-hairline pb-2 pt-4 grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+                    {photos.map((entry) => {
+                      const isSelected = selected.has(entry.slug);
+                      return (
+                        <li key={entry.slug} className="group relative min-w-0">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              selecting ? toggle([entry.slug], !isSelected) : onOpen(entry)
+                            }
+                            className="block w-full text-left outline-none"
+                          >
+                            {entry.image ? (
+                              <MediaThumb
+                                url={entry.image}
+                                kind="image"
+                                className={clsx(
+                                  "aspect-4/3 rounded-lg ring-offset-2 ring-offset-world-bg transition-transform duration-200 group-active:scale-[0.98] group-focus-visible:ring-2 group-focus-visible:ring-world-accent",
+                                  isSelected && "ring-2 ring-world-accent"
+                                )}
+                              />
+                            ) : (
+                              <div className="grid aspect-4/3 place-items-center rounded-lg border border-dashed border-world-hairline text-[12px] text-world-muted">
+                                No image
+                              </div>
+                            )}
+                            <p className={clsx("mt-2 truncate text-[13px] font-medium", !entry.title && "text-world-muted")}>
+                              {entry.title || "Untitled"}
+                            </p>
+                            <p className="truncate text-[12px] text-world-muted">
+                              {[entry.shootType, entry.category].filter(Boolean).join(" · ") || "—"}
+                            </p>
+                          </button>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => toggle([entry.slug], e.target.checked)}
+                            aria-label={`Select ${entry.title || entry.slug}`}
+                            className={clsx(
+                              "absolute left-2 top-2 h-5 w-5 cursor-pointer accent-[var(--world-accent)] transition-opacity",
+                              isSelected || selecting
+                                ? "opacity-100"
+                                : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                            )}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </section>
         );
       })}

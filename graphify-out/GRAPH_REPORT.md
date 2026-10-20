@@ -1,7 +1,7 @@
 # Graph Report - bulk-photo-upload-optional-titles-b8b80d  (2026-10-20)
 
 ## Corpus Check
-- 170 files · ~3,555,347 words
+- 170 files · ~3,555,775 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e00c0100`
+- Built from commit: `c6490091`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
