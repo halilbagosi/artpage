@@ -1,16 +1,16 @@
 # Graph Report - bulk-photo-upload-optional-titles-b8b80d  (2026-10-20)
 
 ## Corpus Check
-- 61 files · ~1,320,946 words
+- 61 files · ~1,321,525 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 301 nodes · 609 edges · 29 communities (26 shown, 3 thin omitted)
+- 303 nodes · 613 edges · 27 communities (25 shown, 2 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ede546c0`
+- Built from commit: `e5057813`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -27,9 +27,7 @@
 - ScreeningRoom.tsx
 - eslint.config.mjs
 - postcss.config.mjs
-- Sample-Morning-Light.md
 - Sample-Still-Waters.md
-- Gateway.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `guard()` - 19 edges
@@ -44,8 +42,8 @@
 10. `sendJson()` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `GET()` --calls--> `readAll()`  [EXTRACTED]
-  src/app/api/admin/content/route.ts → src/lib/admin.ts
+- `AdminPage()` --calls--> `readAll()`  [EXTRACTED]
+  src/app/admin/page.tsx → src/lib/admin.ts
 - `Home()` --calls--> `getSiteForDisplay()`  [EXTRACTED]
   src/app/page.tsx → src/lib/content.ts
 - `ScreeningHero()` --calls--> `isPlayable()`  [EXTRACTED]
@@ -58,11 +56,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (29 total, 3 thin omitted)
+## Communities (27 total, 2 thin omitted)
 
 ### Community 0 - "content.ts"
-Cohesion: 0.09
-Nodes (35): AboutPage(), mailto(), metadata, plural(), ArtPage(), metadata, FilmPage(), metadata (+27 more)
+Cohesion: 0.08
+Nodes (37): AboutPage(), mailto(), metadata, plural(), ArtPage(), metadata, FilmPage(), metadata (+29 more)
 
 ### Community 1 - "compilerOptions"
 Cohesion: 0.10
@@ -70,7 +68,7 @@ Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModu
 
 ### Community 2 - "AtelierGallery.tsx"
 Cohesion: 0.10
-Nodes (49): GET(), POST(), Context, DELETE(), PUT(), target(), Context, DELETE() (+41 more)
+Nodes (52): GET(), POST(), Context, DELETE(), PUT(), target(), Context, DELETE() (+44 more)
 
 ### Community 3 - "package.json"
 Cohesion: 0.07
@@ -85,8 +83,8 @@ Cohesion: 0.14
 Nodes (13): `/about`, `/admin` — local dashboard, Architecture, `/art` — The Atelier, Content model, `/film` — The Screening Room, `/` — Gateway, Goal (+5 more)
 
 ### Community 6 - "devDependencies"
-Cohesion: 0.10
-Nodes (42): BulkPhotoSheet(), SPRING, CollectionGrid(), Dashboard(), entryMeta(), Section, sectionLabel(), capitalize() (+34 more)
+Cohesion: 0.09
+Nodes (46): AdminPage(), metadata, BulkPhotoSheet(), SPRING, CollectionGrid(), Dashboard(), entryMeta(), Section (+38 more)
 
 ### Community 7 - "Artpage — Triptych"
 Cohesion: 0.29
@@ -100,10 +98,6 @@ Nodes (5): archivo, inter, jetbrains, metadata, playfair
 Cohesion: 0.24
 Nodes (12): FilmPlayer(), isPlayable(), Screening(), PlayCue(), ScreeningHero(), ScreeningRoom(), Film, parseUrl() (+4 more)
 
-### Community 22 - "Sample-Morning-Light.md"
-Cohesion: 0.43
-Nodes (6): AdminPage(), metadata, adminEnabled(), mediaUsage(), readAll(), ADMIN_SECTIONS
-
 ### Community 23 - "Sample-Still-Waters.md"
 Cohesion: 0.40
 Nodes (4): LOCAL_ONLY, moved, ROOT, STASH
@@ -111,22 +105,22 @@ Nodes (4): LOCAL_ONLY, moved, ROOT, STASH
 ## Knowledge Gaps
 - **104 isolated node(s):** `eslintConfig`, `name`, `version`, `private`, `dev` (+99 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getSite()` connect `content.ts` to `AtelierGallery.tsx`, `Sample-Morning-Light.md`?**
+- **Why does `getSite()` connect `content.ts` to `AtelierGallery.tsx`?**
   _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Why does `videoEmbed` connect `ScreeningRoom.tsx` to `content.ts`, `AtelierGallery.tsx`?**
   _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Why does `guard()` connect `AtelierGallery.tsx` to `Sample-Morning-Light.md`?**
+- **Why does `guard()` connect `AtelierGallery.tsx` to `devDependencies`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `name`, `version` to the rest of the system?**
   _104 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `content.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08705882352941176 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07811447811447811 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
 - **Should `AtelierGallery.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.10401002506265664 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10056497175141244 - nodes in this community are weakly interconnected._
