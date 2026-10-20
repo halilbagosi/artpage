@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
 import type { Photograph } from "@/lib/content";
 import Reveal from "./Reveal";
-import Lightbox, { type LightboxItem } from "./Lightbox";
+import Lightbox from "./Lightbox";
 
 /** Hand-drawn box, slightly overshooting where the pencil started. */
 const GREASE_PATH =
@@ -15,7 +15,20 @@ export default function DarkroomGallery({
 }: {
   groups: { client: string; photos: Photograph[] }[];
 }) {
-  const [open, setOpen] = useState<LightboxItem | null>(null);
+  // Which shoot and picture is full screen; stepping wraps within that shoot
+  const [open, setOpen] = useState<{ group: number; photo: number } | null>(null);
+  const step = useCallback(
+    (by: number) =>
+      setOpen((o) => {
+        if (!o) return o;
+        const count = groups[o.group].photos.length;
+        return { ...o, photo: (o.photo + by + count) % count };
+      }),
+    [groups]
+  );
+  const prev = useCallback(() => step(-1), [step]);
+  const next = useCallback(() => step(1), [step]);
+  const close = useCallback(() => setOpen(null), []);
 
   // Running frame number across all shoots, computed without render-time mutation
   const groupOffsets: number[] = [];
@@ -23,6 +36,11 @@ export default function DarkroomGallery({
     groupOffsets[i] = offset;
     return offset + group.photos.length;
   }, 0);
+
+  const openPhoto = open ? groups[open.group]?.photos[open.photo] : undefined;
+  const openFrame = open
+    ? String(groupOffsets[open.group] + open.photo + 1).padStart(2, "0")
+    : null;
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-24 pt-10 md:px-10 md:pt-16">
@@ -46,38 +64,40 @@ export default function DarkroomGallery({
               </header>
             </Reveal>
 
-            {/* Strips of film, cut where they wrap */}
-            <div className="flex flex-wrap gap-y-8">
+            {/* Strips of film, cut where they wrap. Rows are justified: each
+                frame grows in proportion to its aspect ratio, so a row fills
+                the sheet at one shared height (capped so a lone frame stays
+                within the screen) */}
+            <div className="flex flex-wrap gap-y-8 [--row-h:190px] sm:[--row-h:230px] lg:[--row-h:270px]">
               {group.photos.map((photo, photoIndex) => {
                 const frame = groupOffsets[groupIndex] + photoIndex + 1;
                 const n = String(frame).padStart(2, "0");
                 return (
-                  <figure key={photo.slug} className="max-w-full">
+                  <figure
+                    key={photo.slug}
+                    className="min-w-0"
+                    style={{
+                      flex: `${photo.aspect} 1 calc(${photo.aspect} * var(--row-h) + 10px)`,
+                      maxWidth: `min(100%, calc(${photo.aspect} * 70vh + 10px))`,
+                    }}
+                  >
                     <button
-                      onClick={() =>
-                        setOpen({
-                          image: photo.image,
-                          title: photo.title,
-                          meta: [`Frame ${n}`, photo.client, photo.category]
-                            .filter(Boolean)
-                            .join(" · "),
-                        })
-                      }
-                      className="group relative block max-w-full cursor-zoom-in bg-[#040303] px-[5px] pb-7 pt-[18px] outline-none"
-                      aria-label={`View ${photo.title}`}
+                      onClick={() => setOpen({ group: groupIndex, photo: photoIndex })}
+                      className="group relative block w-full cursor-zoom-in bg-[#040303] px-[5px] pb-7 pt-[18px] outline-none"
+                      aria-label={`View ${photo.title || `frame ${n}`}`}
                     >
                       <div className="sprockets absolute inset-x-0 top-[5px]" />
 
                       <div
-                        className="relative h-[220px] max-w-full overflow-visible sm:h-[250px] lg:h-[300px]"
+                        className="relative w-full overflow-visible"
                         style={{ aspectRatio: photo.aspect }}
                       >
                         <div className="absolute inset-0 overflow-hidden">
                           <Image
                             src={photo.image}
-                            alt={photo.title}
+                            alt={photo.title || [photo.client, photo.category].filter(Boolean).join(", ")}
                             fill
-                            sizes="(max-width: 640px) 90vw, 420px"
+                            sizes="(max-width: 640px) 100vw, 50vw"
                             className="develop object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                           />
                         </div>
@@ -108,7 +128,7 @@ export default function DarkroomGallery({
 
                     <figcaption className="type-label mt-3 px-1.5">
                       <span className="text-world-accent">{n}</span>{" "}
-                      <span className="text-world-ink/85">{photo.title}</span>
+                      {photo.title && <span className="text-world-ink/85">{photo.title}</span>}
                       {photo.category && (
                         <span className="block text-world-muted">{photo.category}</span>
                       )}
@@ -121,7 +141,25 @@ export default function DarkroomGallery({
         </section>
       ))}
 
-      <Lightbox item={open} onClose={() => setOpen(null)} />
+      <Lightbox
+        item={
+          openPhoto && openFrame !== null
+            ? {
+                image: openPhoto.image,
+                title: openPhoto.title,
+                meta: [`Frame ${openFrame}`, openPhoto.client, openPhoto.category]
+                  .filter(Boolean)
+                  .join(" · "),
+              }
+            : null
+        }
+        onClose={close}
+        {...(open && groups[open.group].photos.length > 1 && {
+          onPrev: prev,
+          onNext: next,
+          position: `${open.photo + 1} / ${groups[open.group].photos.length}`,
+        })}
+      />
     </div>
   );
 }

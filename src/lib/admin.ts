@@ -181,7 +181,9 @@ export function createEntry(collection: CollectionKey, input: Record<string, unk
   const fields = cleanFields(collection, input);
   const dir = collectionDir(collection);
   fs.mkdirSync(dir, { recursive: true });
-  const base = slugify(fields.title);
+  // Untitled pictures are named after their image file
+  const media = fields[COLLECTIONS[collection].mediaKey] ?? "";
+  const base = slugify(fields.title || path.basename(media, path.extname(media)));
   let slug = base;
   for (let n = 2; fs.existsSync(path.join(dir, `${slug}.md`)); n++) {
     slug = `${base}-${n}`;

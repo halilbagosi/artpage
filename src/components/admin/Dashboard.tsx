@@ -11,6 +11,7 @@ import {
   type CollectionKey,
   type Entry,
 } from "@/lib/schema";
+import BulkPhotoSheet from "./BulkPhotoSheet";
 import EntrySheet from "./EntrySheet";
 import MediaLibrary from "./MediaLibrary";
 import SiteSettingsForm from "./SiteSettingsForm";
@@ -44,6 +45,7 @@ export default function Dashboard({
   const [data, setData] = useState(initial);
   const [section, setSection] = useState<Section>(initialSection);
   const [editing, setEditing] = useState<{ entry: Entry | null } | null>(null);
+  const [bulk, setBulk] = useState(false);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -56,6 +58,7 @@ export default function Dashboard({
   const go = (next: Section) => {
     setSection(next);
     setEditing(null);
+    setBulk(false);
     history.replaceState(null, "", `?section=${next}`);
   };
 
@@ -134,9 +137,15 @@ export default function Dashboard({
               <a href={COLLECTIONS[section].href} target="_blank" rel="noreferrer" className={buttonClass.secondary}>
                 View page ↗
               </a>
-              <button type="button" className={buttonClass.primary} onClick={() => setEditing({ entry: null })}>
-                New {COLLECTIONS[section].singular}
-              </button>
+              {section === "photography" ? (
+                <button type="button" className={buttonClass.primary} onClick={() => setBulk(true)}>
+                  Add pictures
+                </button>
+              ) : (
+                <button type="button" className={buttonClass.primary} onClick={() => setEditing({ entry: null })}>
+                  New {COLLECTIONS[section].singular}
+                </button>
+              )}
             </div>
           )}
         </header>
@@ -172,6 +181,16 @@ export default function Dashboard({
             entry={editing.entry}
             media={data.media}
             onClose={() => setEditing(null)}
+            onSaved={notify}
+            onUploaded={refresh}
+          />
+        )}
+        {bulk && section === "photography" && (
+          <BulkPhotoSheet
+            key="bulk"
+            entries={data.entries.photography}
+            media={data.media}
+            onClose={() => setBulk(false)}
             onSaved={notify}
             onUploaded={refresh}
           />
@@ -238,7 +257,9 @@ function CollectionGrid({
                 No image
               </div>
             )}
-            <p className="mt-2.5 truncate text-[14px] font-medium">{entry.title || entry.slug}</p>
+            <p className={clsx("mt-2.5 truncate text-[14px] font-medium", !entry.title && "text-world-muted")}>
+              {entry.title || "Untitled"}
+            </p>
             <p className="truncate text-[12px] text-world-muted">
               {entryMeta(collection, entry) || "—"}
               {entry.sample === "true" && " · Sample"}
