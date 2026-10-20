@@ -14,6 +14,7 @@ import {
 import BulkPhotoSheet from "./BulkPhotoSheet";
 import EntrySheet from "./EntrySheet";
 import MediaLibrary from "./MediaLibrary";
+import ShootGroups from "./ShootGroups";
 import SiteSettingsForm from "./SiteSettingsForm";
 import { api, buttonClass, MediaThumb } from "./ui";
 
@@ -164,7 +165,15 @@ export default function Dashboard({
           <MediaLibrary media={data.media} usage={data.usage} onChanged={notify} />
         )}
 
-        {section !== "site" && section !== "media" && (
+        {section === "photography" && (
+          <ShootGroups
+            entries={data.entries.photography}
+            onOpen={(entry) => setEditing({ entry })}
+            onSaved={notify}
+          />
+        )}
+
+        {section !== "site" && section !== "media" && section !== "photography" && (
           <CollectionGrid
             collection={section}
             entries={data.entries[section]}

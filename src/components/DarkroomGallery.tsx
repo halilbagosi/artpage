@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import type { Photograph } from "@/lib/content";
+import type { Shoot } from "@/lib/content";
+import { SHOOT_TYPES } from "@/lib/schema";
 import Reveal from "./Reveal";
 import Lightbox from "./Lightbox";
 
@@ -11,25 +12,26 @@ import Lightbox from "./Lightbox";
 const GREASE_PATH =
   "M4,7 C28,3 66,5 97,3 C98,34 96,68 98,96 C66,98 31,96 3,97 C2,70 4,36 2,5 C9,4 14,6 19,9";
 
-export default function DarkroomGallery({
-  groups,
-}: {
-  groups: { client: string; photos: Photograph[] }[];
-}) {
+export default function DarkroomGallery({ shoots }: { shoots: Shoot[] }) {
+  // "" = every shoot; otherwise one of SHOOT_TYPES
+  const [filter, setFilter] = useState("");
+  const groups = filter ? shoots.filter((g) => g.type === filter) : shoots;
+  const filters = SHOOT_TYPES.map((type) => ({
+    type,
+    count: shoots.filter((g) => g.type === type).length,
+  })).filter((f) => f.count > 0);
+
   // Which shoot and picture is full screen; stepping wraps within that shoot
   const [open, setOpen] = useState<{ group: number; photo: number } | null>(null);
-  const step = useCallback(
-    (by: number) =>
-      setOpen((o) => {
-        if (!o) return o;
-        const count = groups[o.group].photos.length;
-        return { ...o, photo: (o.photo + by + count) % count };
-      }),
-    [groups]
-  );
-  const prev = useCallback(() => step(-1), [step]);
-  const next = useCallback(() => step(1), [step]);
-  const close = useCallback(() => setOpen(null), []);
+  const step = (by: number) =>
+    setOpen((o) => {
+      if (!o) return o;
+      const count = groups[o.group].photos.length;
+      return { ...o, photo: (o.photo + by + count) % count };
+    });
+  const prev = () => step(-1);
+  const next = () => step(1);
+  const close = () => setOpen(null);
 
   // Running frame number across all shoots, computed without render-time mutation
   const groupOffsets: number[] = [];
@@ -45,6 +47,31 @@ export default function DarkroomGallery({
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-24 pt-10 md:px-10 md:pt-16">
+      {filters.length > 0 && (
+        <nav aria-label="Filter shoots" className="flex flex-wrap items-center gap-x-6 gap-y-2">
+          {[{ type: "", label: "All", count: shoots.length }, ...filters.map((f) => ({ ...f, label: f.type }))].map(
+            ({ type, label, count }) => (
+              <button
+                key={label}
+                type="button"
+                aria-pressed={filter === type}
+                onClick={() => {
+                  setFilter(type);
+                  setOpen(null);
+                }}
+                className={`type-label border-b pb-1.5 transition-colors ${
+                  filter === type
+                    ? "border-world-accent text-world-ink"
+                    : "border-transparent text-world-muted hover:text-world-ink"
+                }`}
+              >
+                {label} <span className="text-world-accent">{String(count).padStart(2, "0")}</span>
+              </button>
+            )
+          )}
+        </nav>
+      )}
+
       {groups.map((group, groupIndex) => (
         <section key={group.client} className="py-8 md:py-12">
           {/* Contact sheet: one sheet of paper per shoot */}

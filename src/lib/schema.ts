@@ -24,6 +24,9 @@ export const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+/** Darkroom filter: private clients (weddings, couples) vs. brands and businesses. */
+export const SHOOT_TYPES = ["Client", "Business"];
+
 export const COLLECTIONS = {
   paintings: {
     label: "Paintings",
@@ -57,6 +60,13 @@ export const COLLECTIONS = {
         label: "Shoot / client",
         type: "text",
         hint: "Pictures with the same client are grouped into one shoot",
+      },
+      {
+        key: "shootType",
+        label: "Shoot type",
+        type: "select",
+        options: SHOOT_TYPES,
+        hint: "Filters the Darkroom between client and business shoots",
       },
       { key: "category", label: "Caption", type: "text", hint: "e.g. Room 1" },
     ],
