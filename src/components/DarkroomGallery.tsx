@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Photograph } from "@/lib/content";
 import Reveal from "./Reveal";
@@ -64,17 +65,14 @@ export default function DarkroomGallery({
               </header>
             </Reveal>
 
-            {/* Strips of film, cut where they wrap. Rows are justified: each
-                frame grows in proportion to its aspect ratio, so a row fills
-                the sheet at one shared height (capped so a lone frame stays
-                within the screen) */}
-            <div className="flex flex-wrap gap-y-8 [--row-h:190px] sm:[--row-h:230px] lg:[--row-h:270px]">
-              {group.photos.map((photo, photoIndex) => {
+            <CollapsibleStrips count={group.photos.length}>
+              {(hidden) => group.photos.map((photo, photoIndex) => {
                 const frame = groupOffsets[groupIndex] + photoIndex + 1;
                 const n = String(frame).padStart(2, "0");
                 return (
                   <figure
                     key={photo.slug}
+                    inert={hidden(photoIndex)}
                     className="min-w-0"
                     style={{
                       flex: `${photo.aspect} 1 calc(${photo.aspect} * var(--row-h) + 10px)`,
@@ -136,7 +134,7 @@ export default function DarkroomGallery({
                   </figure>
                 );
               })}
-            </div>
+            </CollapsibleStrips>
           </div>
         </section>
       ))}
@@ -161,5 +159,100 @@ export default function DarkroomGallery({
         })}
       />
     </div>
+  );
+}
+
+/** Rows a shoot shows before its "show more" toggle. */
+const COLLAPSED_ROWS = 2;
+
+/**
+ * Strips of film, cut where they wrap. Rows are justified: each frame grows in
+ * proportion to its aspect ratio, so a row fills the sheet at one shared
+ * height (capped so a lone frame stays within the screen). Shoots longer than
+ * COLLAPSED_ROWS are clipped at the start of the next row until expanded; the
+ * rows are measured, since wrapping depends on the sheet's width.
+ */
+function CollapsibleStrips({
+  count,
+  children,
+}: {
+  count: number;
+  /** `hidden(i)`: frame i is clipped away right now */
+  children: (hidden: (index: number) => boolean) => React.ReactNode;
+}) {
+  const strips = useRef<HTMLDivElement>(null);
+  const [cut, setCut] = useState<{ height: number; hiddenFrom: number } | null>(null);
+  const [expanded, setExpanded] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = strips.current;
+    if (!el) return;
+    const measure = () => {
+      const frames = Array.from(el.children) as HTMLElement[];
+      let rows = 0;
+      let lastTop = -Infinity;
+      for (const [i, frame] of frames.entries()) {
+        if (frame.offsetTop <= lastTop) continue;
+        lastTop = frame.offsetTop;
+        if (++rows > COLLAPSED_ROWS) {
+          const gap = parseFloat(getComputedStyle(el).rowGap) || 0;
+          setCut({ height: frame.offsetTop - gap, hiddenFrom: i });
+          return;
+        }
+      }
+      setCut(null);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [count]);
+
+  const collapsed = !!cut && !expanded;
+  const toggle = () => {
+    setExpanded((e) => !e);
+    // Collapsing a long shoot can leave the reader far below it
+    const sheet = strips.current?.parentElement;
+    if (expanded && sheet && sheet.getBoundingClientRect().top < 0) {
+      sheet.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  return (
+    <>
+      <motion.div
+        className="overflow-hidden"
+        initial={false}
+        animate={{ height: collapsed ? cut.height : "auto" }}
+        transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+      >
+        <div
+          ref={strips}
+          className="relative flex flex-wrap gap-y-8 [--row-h:190px] sm:[--row-h:230px] lg:[--row-h:270px]"
+        >
+          {children((i) => collapsed && i >= cut.hiddenFrom)}
+        </div>
+      </motion.div>
+
+      {cut && (
+        <div className="mt-6 flex justify-center border-t border-world-hairline pt-5">
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded={expanded}
+            className="type-label group inline-flex items-center gap-2.5 text-world-muted transition-colors hover:text-world-ink"
+          >
+            {expanded ? "Show less" : `Show ${count - cut.hiddenFrom} more`}
+            <svg
+              aria-hidden
+              viewBox="0 0 12 12"
+              className={`h-3 w-3 text-world-accent transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+            >
+              <path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      )}
+    </>
   );
 }

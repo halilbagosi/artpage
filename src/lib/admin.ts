@@ -285,6 +285,37 @@ function safeMediaName(original: string) {
   return name;
 }
 
+/** Longest edge kept for uploaded images: sharp full screen on a retina display. */
+const MAX_IMAGE_EDGE = 3200;
+
+/**
+ * Re-encode an uploaded image so the static site doesn't serve camera
+ * originals: bake in EXIF rotation, cap the size at MAX_IMAGE_EDGE, and
+ * compress at a visually lossless quality (PNG stays lossless). The colour
+ * profile is kept; other metadata, like GPS, is dropped. Falls back to the
+ * original bytes when they're already smaller or can't be decoded.
+ */
+async function optimizeImage(input: Buffer, ext: string): Promise<Buffer> {
+  if (![".jpg", ".jpeg", ".png", ".webp", ".avif"].includes(ext)) return input;
+  try {
+    const { default: sharp } = await import("sharp");
+    const { width = 0, height = 0 } = await sharp(input).metadata();
+    let image = sharp(input)
+      .autoOrient()
+      .resize({ width: MAX_IMAGE_EDGE, height: MAX_IMAGE_EDGE, fit: "inside", withoutEnlargement: true })
+      .keepIccProfile();
+    if (ext === ".png") image = image.png({ compressionLevel: 9, effort: 10 });
+    else if (ext === ".webp") image = image.webp({ quality: 88 });
+    else if (ext === ".avif") image = image.avif({ quality: 65 });
+    else image = image.jpeg({ quality: 86, mozjpeg: true });
+    const output = await image.toBuffer();
+    const resized = Math.max(width, height) > MAX_IMAGE_EDGE;
+    return resized || output.length < input.length ? output : input;
+  } catch {
+    return input;
+  }
+}
+
 export async function saveUpload(file: File): Promise<MediaFile> {
   const kind = mediaKind(file.name);
   if (!kind) {
@@ -294,8 +325,10 @@ export async function saveUpload(file: File): Promise<MediaFile> {
   }
   fs.mkdirSync(MEDIA_DIR, { recursive: true });
   const name = safeMediaName(file.name);
-  fs.writeFileSync(path.join(MEDIA_DIR, name), Buffer.from(await file.arrayBuffer()));
-  return { name, url: `/media/${name}`, size: file.size, kind };
+  let data: Buffer = Buffer.from(await file.arrayBuffer());
+  if (kind === "image") data = await optimizeImage(data, path.extname(name));
+  fs.writeFileSync(path.join(MEDIA_DIR, name), data);
+  return { name, url: `/media/${name}`, size: data.length, kind };
 }
 
 /** Every place a media URL is referenced, as human-readable labels. */
@@ -426,7 +459,9 @@ export async function replaceMedia(name: string, file: File): Promise<MediaFile>
     );
   }
   const next = versionedName(name, path.extname(file.name).toLowerCase());
-  fs.writeFileSync(path.join(MEDIA_DIR, next), Buffer.from(await file.arrayBuffer()));
+  let data: Buffer = Buffer.from(await file.arrayBuffer());
+  if (kind === "image") data = await optimizeImage(data, path.extname(next));
+  fs.writeFileSync(path.join(MEDIA_DIR, next), data);
   replaceReferences(`/media/${name}`, `/media/${next}`);
   fs.unlinkSync(path.join(MEDIA_DIR, name));
   return fileInfo(next);
