@@ -108,9 +108,9 @@ export default function ShootGroups({
           <section
             key={client}
             aria-label={client}
-            className="rounded-2xl border border-world-hairline bg-white/40 px-4 py-3 md:px-5"
+            className="rounded-2xl border border-world-hairline bg-white/40 px-5 py-3"
           >
-            <header className="flex flex-wrap items-center gap-x-3 gap-y-2 py-1">
+            <header className="flex items-center gap-3 py-1">
               <button
                 type="button"
                 aria-expanded={open}
@@ -123,7 +123,7 @@ export default function ShootGroups({
                     return next;
                   })
                 }
-                className="-ml-1 flex min-w-0 basis-full items-center gap-3 sm:basis-0 sm:flex-1 rounded-lg px-1 py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-world-accent"
+                className="-ml-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-1 py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-world-accent"
               >
                 <svg
                   aria-hidden
@@ -135,7 +135,7 @@ export default function ShootGroups({
                 >
                   <path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <h2 className="truncate font-serif text-xl tracking-[-0.01em] md:text-2xl">{client}</h2>
+                <h2 className="truncate font-serif text-2xl tracking-[-0.01em]">{client}</h2>
                 <span className="text-[13px] tabular-nums text-world-muted">{photos.length}</span>
                 <span
                   className={clsx(
@@ -151,7 +151,7 @@ export default function ShootGroups({
               <button
                 type="button"
                 onClick={() => toggle(slugs, !all)}
-                className={`${buttonClass.secondary} ml-6 px-3 py-1 text-[13px] sm:ml-0`}
+                className={`${buttonClass.secondary} px-3 py-1 text-[13px]`}
               >
                 {all
                   ? "Deselect all"
