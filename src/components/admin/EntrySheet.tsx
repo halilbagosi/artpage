@@ -14,6 +14,8 @@ import { api, buttonClass, Field, inputClass, sendJson } from "./ui";
 
 const SPRING = { type: "spring", bounce: 0, duration: 0.4 } as const;
 
+const capitalize = (s: string) => s[0].toUpperCase() + s.slice(1);
+
 type Values = Record<string, string | boolean>;
 
 function initialValues(collection: CollectionKey, entry: Entry | null): Values {
@@ -83,7 +85,7 @@ export default function EntrySheet({
       } else {
         await api(`/api/admin/entries/${collection}`, sendJson("POST", values));
       }
-      await onSaved(`“${values.title}” saved`);
+      await onSaved(values.title ? `“${values.title}” saved` : `${capitalize(config.singular)} saved`);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save");
@@ -124,7 +126,7 @@ export default function EntrySheet({
       <motion.form
         role="dialog"
         aria-modal="true"
-        aria-label={entry ? `Edit ${entry.title}` : `New ${config.singular}`}
+        aria-label={entry ? `Edit ${entry.title || config.singular}` : `New ${config.singular}`}
         onSubmit={save}
         className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col bg-world-bg shadow-[-30px_0_80px_-30px_rgba(0,0,0,0.35)]"
         initial={{ x: "100%" }}
@@ -136,7 +138,7 @@ export default function EntrySheet({
           <div className="min-w-0">
             <p className="type-label text-world-muted">{config.room}</p>
             <h2 className="mt-1 truncate font-serif text-2xl tracking-[-0.01em]">
-              {entry ? entry.title || entry.slug : `New ${config.singular}`}
+              {entry ? entry.title || "Untitled" : `New ${config.singular}`}
             </h2>
           </div>
           <button

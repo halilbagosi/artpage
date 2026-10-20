@@ -50,7 +50,7 @@ export const COLLECTIONS = {
     href: "/photography",
     mediaKey: "image",
     fields: [
-      { key: "title", label: "Title", type: "text", required: true },
+      { key: "title", label: "Title", type: "text", hint: "Optional" },
       { key: "image", label: "Image", type: "media", accept: "image", required: true },
       {
         key: "client",
