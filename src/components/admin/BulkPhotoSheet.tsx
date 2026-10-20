@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { Entry, MediaFile } from "@/lib/schema";
+import { SHOOT_TYPES, type Entry, type MediaFile } from "@/lib/schema";
 import MediaPicker from "./MediaPicker";
 import { api, buttonClass, Field, inputClass, MediaThumb, sendJson, uploadFiles } from "./ui";
 
@@ -25,6 +25,7 @@ export default function BulkPhotoSheet({
 }) {
   const [client, setClient] = useState("");
   const [category, setCategory] = useState("");
+  const [shootType, setShootType] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [picking, setPicking] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -33,7 +34,14 @@ export default function BulkPhotoSheet({
   const fileInput = useRef<HTMLInputElement>(null);
   const clientInput = useRef<HTMLInputElement>(null);
   const clients = [...new Set(entries.map((e) => e.client?.trim()).filter(Boolean))].sort();
-  const dirty = images.length > 0 || client !== "" || category !== "";
+  const dirty = images.length > 0 || client !== "" || category !== "" || shootType !== "";
+
+  // An existing shoot already has a type: carry it over
+  const pickClient = (value: string) => {
+    setClient(value);
+    const existing = entries.find((e) => e.client?.trim() === value.trim() && e.shootType);
+    if (existing) setShootType(existing.shootType);
+  };
 
   const requestClose = () => {
     if (!dirty || window.confirm("Discard these pictures?")) onClose();
@@ -77,7 +85,7 @@ export default function BulkPhotoSheet({
     let done = 0;
     try {
       for (const image of images) {
-        await api("/api/admin/entries/photography", sendJson("POST", { image, client, category }));
+        await api("/api/admin/entries/photography", sendJson("POST", { image, client, category, shootType }));
         done++;
       }
       const what = `${done} picture${done > 1 ? "s" : ""}`;
@@ -140,7 +148,7 @@ export default function BulkPhotoSheet({
               ref={clientInput}
               list="bulk-clients"
               value={client}
-              onChange={(e) => setClient(e.target.value)}
+              onChange={(e) => pickClient(e.target.value)}
               className={inputClass}
             />
             <datalist id="bulk-clients">
@@ -148,6 +156,22 @@ export default function BulkPhotoSheet({
                 <option key={c} value={c} />
               ))}
             </datalist>
+          </Field>
+
+          <Field label="Shoot type" hint="Filters the Darkroom between client and business shoots" htmlFor="bulk-type">
+            <select
+              id="bulk-type"
+              value={shootType}
+              onChange={(e) => setShootType(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">—</option>
+              {SHOOT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </Field>
 
           <Field label="Caption" hint="Optional — applied to every picture, e.g. Room 1" htmlFor="bulk-category">

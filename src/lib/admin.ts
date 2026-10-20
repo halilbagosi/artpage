@@ -206,6 +206,28 @@ export function updateEntry(
   fs.writeFileSync(file, serialize(merged, body));
 }
 
+/** Set the same fields on several entries at once; other fields are left as they are. */
+export function patchEntries(
+  collection: CollectionKey,
+  slugs: unknown,
+  patch: unknown
+) {
+  if (!Array.isArray(slugs) || slugs.length === 0) throw new AdminError("Select some entries");
+  if (!patch || typeof patch !== "object") throw new AdminError("Nothing to change");
+  const keys = new Set(fieldsOf(collection).map((f) => f.key));
+  for (const key of Object.keys(patch)) {
+    if (!keys.has(key)) throw new AdminError(`Unknown field: ${key}`);
+  }
+  for (const slug of slugs) {
+    if (typeof slug !== "string") throw new AdminError("Invalid entry id");
+    assertSlug(slug);
+    const file = path.join(collectionDir(collection), `${slug}.md`);
+    if (!fs.existsSync(file)) throw new AdminError(`Entry not found: ${slug}`, 404);
+    updateEntry(collection, slug, { ...parseLines(readRaw(file).lines), ...patch });
+  }
+  return slugs.length;
+}
+
 export function deleteEntry(collection: CollectionKey, slug: string) {
   assertSlug(slug);
   const file = path.join(collectionDir(collection), `${slug}.md`);

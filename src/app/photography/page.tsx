@@ -24,7 +24,7 @@ export default function PhotographyPage() {
           years={photographyYears(site)}
           blurb={site.worlds.photography.blurb}
         />
-        <DarkroomGallery groups={groups} />
+        <DarkroomGallery shoots={groups} />
       </div>
     </WorldShell>
   );

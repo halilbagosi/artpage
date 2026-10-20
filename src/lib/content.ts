@@ -155,12 +155,21 @@ export interface Photograph {
   image: string;
   client: string;
   category: string;
+  /** "Client", "Business" or "" (uncategorised) */
+  shootType: string;
   /** width / height of the photograph; contact-sheet frames render at this ratio */
   aspect: number;
 }
 
+export interface Shoot {
+  client: string;
+  /** The type most of the shoot's pictures carry ("" when none do) */
+  type: string;
+  photos: Photograph[];
+}
+
 /** Photographs grouped by client, preserving alphabetical client order. */
-export function getPhotographsByClient(): { client: string; photos: Photograph[] }[] {
+export function getPhotographsByClient(): Shoot[] {
   const photos = (readCollection("photography") as unknown as Photograph[])
     .filter((p) => mediaExists(p.image))
     .map((p) => ({ ...p, aspect: imageAspect(p.image) ?? 3 / 2 }));
@@ -172,7 +181,15 @@ export function getPhotographsByClient(): { client: string; photos: Photograph[]
   }
   return [...groups.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([client, items]) => ({ client, photos: items }));
+    .map(([client, items]) => ({ client, type: majorityType(items), photos: items }));
+}
+
+function majorityType(photos: Photograph[]) {
+  const counts = new Map<string, number>();
+  for (const { shootType } of photos) {
+    if (shootType) counts.set(shootType, (counts.get(shootType) ?? 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
 }
 
 export interface Film {
